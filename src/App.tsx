@@ -7,6 +7,7 @@ import Team from './components/Team';
 import RnD from './components/RnD';
 import About from './components/About';
 import Gallery from './components/Gallery';
+import Clients from './components/Clients';
 import LeadForm from './components/LeadForm';
 import CompanyChatbot from './components/CompanyChatbot';
 import { useScrollAnimation } from './hooks/useScrollAnimation';
@@ -77,6 +78,7 @@ export default function App() {
         <RnD />
         <About />
         <Gallery />
+        <Clients />
         <Team />
         <LeadForm />
       </main>

@@ -1,5 +1,3 @@
-import { Linkedin, Twitter, Facebook } from 'lucide-react';
-
 const team = [
   {
     name: 'Rajendra R. Palshikar',

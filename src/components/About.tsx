@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Target, Wrench, Leaf, X, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Target, Wrench, Leaf, X } from 'lucide-react';
 
 const pillars = [
   {

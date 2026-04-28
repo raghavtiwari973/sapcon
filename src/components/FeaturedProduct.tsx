@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, X, Activity, Droplets, ShieldCheck, Download, Settings, ChevronRight } from 'lucide-react';
 
@@ -340,6 +340,30 @@ type ProductItem = {
   itemCode: string;
 };
 
+const normalizeProductName = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const featuredProductKey = normalizeProductName(
+  `${featuredProductInfo.name}${featuredProductInfo.type}`,
+);
+
+const uniqueOtherProducts = otherProducts.filter((product, index, allProducts) => {
+  const productKey = normalizeProductName(product.name);
+
+  if (productKey.includes(featuredProductKey) || featuredProductKey.includes(productKey)) {
+    return false;
+  }
+
+  return (
+    index ===
+    allProducts.findIndex(
+      (candidate) =>
+        candidate.itemCode === product.itemCode ||
+        normalizeProductName(candidate.name) === productKey,
+    )
+  );
+});
+
 
 
 export default function FeaturedProduct() {
@@ -453,57 +477,6 @@ export default function FeaturedProduct() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* SECTION 2: Highlighted Products Tabs */}
-      <section className="relative bg-[#050B1F] py-20 lg:py-28 border-t border-white/5 overflow-hidden">
-        {/* Glow effects */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#06B6D4]/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#4A6CF7]/5 rounded-full blur-[120px] pointer-events-none" />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="mb-16 fade-up">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="h-[2px] w-12 bg-gradient-to-r from-[#4A6CF7] to-[#06B6D4] rounded-full"></div>
-              <span className="text-[#06B6D4] text-sm font-bold uppercase tracking-widest">Best Product</span>
-            </div>
-            
-            {/* Product Selection Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {highlightedProducts.map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => {
-                    setActiveHighlightId(p.id);
-                    setShowHighlightModal(true);
-                  }}
-                  className="group relative flex flex-col text-left p-6 rounded-3xl transition-all duration-300 border cursor-pointer hover:-translate-y-1 overflow-hidden bg-[#0A0F2C] border-white/5 hover:bg-[#0D1840] hover:border-white/20 shadow-lg"
-                >
-                  {/* Subtle background glow for active state */}
-                  {activeHighlightId === p.id && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#4A6CF7]/10 to-[#06B6D4]/10 pointer-events-none" />
-                  )}
-                  
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div className="text-[#06B6D4] font-bold text-xs uppercase tracking-widest mb-3">{p.tagline}</div>
-                    <h3 className="text-white font-bold text-xl leading-snug mb-6 flex-1">{p.name}</h3>
-                    <div className="inline-flex items-center justify-between w-full mt-auto">
-                      <span className="px-3 py-1.5 bg-white/5 rounded-full text-[11px] font-bold tracking-wider text-gray-300 border border-white/10 uppercase">
-                        {p.highlight}
-                      </span>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                        activeHighlightId === p.id ? 'bg-[#06B6D4] text-white' : 'bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white'
-                      }`}>
-                        <ArrowRight size={14} className={`transition-transform ${activeHighlightId === p.id ? '' : '-rotate-45 group-hover:rotate-0'}`} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
         </div>
       </section>
 
@@ -678,7 +651,7 @@ export default function FeaturedProduct() {
                 </h2>
 
                 <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
-                  {otherProducts.map((product: ProductItem, idx: number) => (
+                  {uniqueOtherProducts.map((product: ProductItem, idx: number) => (
                     <a
                       key={idx}
                       href={product.href}
@@ -706,6 +679,38 @@ export default function FeaturedProduct() {
                         </span>
                       </div>
                     </a>
+                  ))}
+                  {highlightedProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveHighlightId(product.id);
+                        setShowHighlightModal(true);
+                        setIsModalOpen(false);
+                      }}
+                      className="group overflow-hidden rounded-xl border border-white/10 bg-white/5 text-left transition-all hover:-translate-y-1 hover:bg-white/10 hover:border-white/20"
+                    >
+                      <div className="aspect-[16/10] overflow-hidden bg-white">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-contain bg-white p-4 transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="p-5">
+                        <h3 className="text-lg font-bold text-white leading-snug mb-2">{product.name}</h3>
+                        <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-gray-400 mb-4">
+                          <span>{product.tagline}</span>
+                          <span className="text-gray-600">|</span>
+                          <span>{product.highlight}</span>
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#06B6D4]">
+                          Explore <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </div>
+                    </button>
                   ))}
                 </div>
               </div>

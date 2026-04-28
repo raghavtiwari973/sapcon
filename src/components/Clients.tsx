@@ -375,7 +375,7 @@ const ClientLogo: React.FC<ClientLogoProps> = ({ id, name, logoUrl }) => {
         src={imgSrc}
         alt={`${name} logo`}
         loading="lazy"
-        className="h-20 w-20 md:h-24 md:w-24 mb-3 rounded-2xl object-contain bg-white p-2"
+        className="h-20 w-full max-w-[112px] md:h-24 md:max-w-[128px] mb-3 rounded-2xl object-contain bg-white px-3 py-2 shadow-sm"
         onError={() => {
           if (imgSrc !== fallbackLogoUrl) {
             setImgSrc(fallbackLogoUrl);
@@ -389,7 +389,7 @@ const ClientLogo: React.FC<ClientLogoProps> = ({ id, name, logoUrl }) => {
 
   return (
     <div
-      className="mb-3 inline-flex h-20 w-20 md:h-24 md:w-24 items-center justify-center rounded-2xl bg-blue-300/20 text-lg font-bold text-blue-100"
+      className="mb-3 inline-flex h-20 w-full max-w-[112px] md:h-24 md:max-w-[128px] items-center justify-center rounded-2xl bg-blue-300/20 text-lg font-bold text-blue-100"
       title={name}
     >
       {getInitials(name)}
@@ -450,7 +450,7 @@ const ClientsModalPanel: React.FC<ClientsModalPanelProps> = ({ isOpen, onClose, 
         onClick={onClose}
       >
         <div
-          className="bg-gradient-to-b from-slate-900/95 to-slate-950 border border-blue-500/20 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden pointer-events-auto shadow-2xl shadow-blue-950/50"
+          className="bg-gradient-to-b from-slate-900/95 to-slate-950 border border-blue-500/20 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden pointer-events-auto shadow-2xl shadow-blue-950/50"
           onClick={(e) => e.stopPropagation()}
           style={{
             animation: 'modal-scale-in 0.3s ease-out',
@@ -472,26 +472,39 @@ const ClientsModalPanel: React.FC<ClientsModalPanelProps> = ({ isOpen, onClose, 
             </button>
           </div>
 
-          {/* Category Filters */}
-          <div className="flex flex-wrap gap-2 px-6 md:px-8 py-4 border-b border-blue-500/20 bg-slate-900/50">
-            {allCategories.map(category => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                  activeCategory === category
-                    ? 'bg-blue-500/20 text-blue-300 border border-blue-400/50 shadow-[0_0_10px_rgba(59,130,246,0.2)]'
-                    : 'bg-slate-800/50 text-slate-400 border border-transparent hover:bg-slate-800 hover:text-slate-200'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          {/* Category Filter Dropdown */}
+          <div className="px-4 sm:px-6 md:px-8 py-4 border-b border-blue-500/20 bg-slate-900/50">
+            <div className="max-w-sm">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Filter by Category
+              </label>
+              <div className="relative">
+                <select
+                  value={activeCategory}
+                  onChange={(e) => setActiveCategory(e.target.value)}
+                  className="w-full appearance-none rounded-2xl border border-blue-400/25 bg-slate-900/90 px-4 py-3 pr-12 text-sm font-medium text-slate-200 outline-none transition-all duration-200 hover:border-blue-400/45 focus:border-blue-400/60 focus:ring-2 focus:ring-blue-500/20"
+                >
+                  {allCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+                <svg
+                  className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           <div className="overflow-y-auto max-h-[calc(90vh-260px)]">
-            <div className="p-6 md:p-8">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="p-4 sm:p-6 md:p-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                 {filteredClients.map((client, index) => (
                   <div
                     key={client.id}
@@ -500,17 +513,19 @@ const ClientsModalPanel: React.FC<ClientsModalPanelProps> = ({ isOpen, onClose, 
                       animation: `fade-in 0.3s ease-out ${index * 0.02}s both`,
                     }}
                   >
-                <div className="p-4 rounded-2xl bg-slate-800/30 backdrop-blur-sm border border-blue-500/20 hover:bg-blue-500/10 hover:border-blue-400/40 transition-all duration-300 cursor-pointer hover:scale-105 h-full flex flex-col items-center justify-center text-center group-hover:shadow-lg group-hover:shadow-blue-500/20">
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-800/30 backdrop-blur-sm border border-blue-500/20 hover:bg-blue-500/10 hover:border-blue-400/40 transition-all duration-300 cursor-pointer hover:scale-[1.03] min-h-[220px] h-full flex flex-col items-center justify-start text-center group-hover:shadow-lg group-hover:shadow-blue-500/20">
                       <ClientLogo
                         id={client.id}
                         name={client.name}
                         logoUrl={client.logoUrl}
                       />
-                      <div className="mt-1">
-                        <p className="text-slate-300 group-hover:text-blue-300 font-semibold text-sm uppercase tracking-wide transition-colors duration-200">
+                      <div className="mt-2 w-full">
+                        <p className="text-slate-300 group-hover:text-blue-300 font-semibold text-sm sm:text-base leading-snug tracking-wide transition-colors duration-200 line-clamp-2 min-h-[2.75rem] flex items-center justify-center">
                           {client.name}
                         </p>
-                        <p className="text-slate-500 text-xs mt-0.5">{client.category}</p>
+                        <p className="text-slate-500 text-xs sm:text-sm mt-1 leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                          {client.category}
+                        </p>
                       </div>
                     </div>
                   </div>

@@ -27,43 +27,49 @@ export default function Gallery() {
   const [showGrid, setShowGrid] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [showStallPhotos, setShowStallPhotos] = useState(false);
-  const [previewImage, setPreviewImage] = useState<typeof images[0] | null>(null);
+  const [previewImage, setPreviewImage] = useState<{id: number, src: string} | null>(null);
 
-  // Auto-slider logic
+  // Auto-slider logic for installations
   useEffect(() => {
-    if (isHovered || showGrid || showVideo || showStallPhotos || previewImage) return;
+    if (isHovered || showGrid || isVideoHovered || showVideo || showStallPhotos || previewImage) return;
 
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
     }, 3000);
 
     return () => clearInterval(timer);
-  }, [isHovered, showGrid, showVideo, showStallPhotos, previewImage]);
+  }, [isHovered, showGrid, isVideoHovered, showVideo, showStallPhotos, previewImage]);
 
   // Auto-slider logic for videos
   useEffect(() => {
-    if (isVideoHovered || showGrid || showVideo || showStallPhotos || previewImage) return;
+    if (isHovered || showGrid || isVideoHovered || showVideo || showStallPhotos || previewImage) return;
 
     const timer = setInterval(() => {
       setCurrentVideoIndex((prev) => (prev + 1) % plantVideos.length);
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [isVideoHovered, showGrid, showVideo, showStallPhotos, previewImage]);
+  }, [isHovered, showGrid, isVideoHovered, showVideo, showStallPhotos, previewImage]);
 
   // Auto-slider logic for stall photos
   useEffect(() => {
-    if (isStallHovered || showGrid || showVideo || showStallPhotos || previewImage) return;
+    if (isHovered || showGrid || isStallHovered || showVideo || showStallPhotos || previewImage) return;
 
     const timer = setInterval(() => {
       setCurrentStallIndex((prev) => (prev + 1) % stallImages.length);
     }, 4000);
 
     return () => clearInterval(timer);
-  }, [isStallHovered, showGrid, showVideo, showStallPhotos, previewImage]);
+  }, [isHovered, showGrid, isStallHovered, showVideo, showStallPhotos, previewImage]);
 
-  const handleNext = () => setCurrentIndex((prev) => (prev + 1) % images.length);
-  const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
 
   const handleNextVideo = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -111,17 +117,16 @@ export default function Gallery() {
         </div>
 
         {/* 3 Cards Uniform Grid */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          
-          {/* Card 1: Installations Slider */}
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
+
+          {/* Installations Card */}
           <div
             className="relative flex flex-col rounded-3xl overflow-hidden border border-[#4A6CF7]/20 shadow-2xl shadow-blue-900/10 fade-up hover:border-[#4A6CF7]/40 transition-colors duration-300"
             style={{ background: 'linear-gradient(160deg, #0D1840 0%, #0A0F2C 100%)' }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Main Slider Image Area */}
-            <div className="relative aspect-[4/3] w-full overflow-hidden bg-black">
+            <div className="relative aspect-[4/3] w-full overflow-hidden bg-black group cursor-pointer" onClick={() => setShowGrid(true)}>
               <AnimatePresence mode="wait">
                 <motion.img
                   key={currentIndex}
@@ -131,7 +136,7 @@ export default function Gallery() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="absolute inset-0 w-full h-full object-cover opacity-80"
+                  className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80"
                 />
               </AnimatePresence>
 
@@ -147,9 +152,7 @@ export default function Gallery() {
                 />
               </div>
 
-              {/* Overlay Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F2C] via-transparent to-transparent pointer-events-none z-10" />
-
               {/* Slider Controls (Arrows) */}
               <div className="absolute inset-0 flex items-center justify-between px-3 z-20 opacity-0 hover:opacity-100 transition-opacity duration-300">
                 <button
@@ -165,17 +168,15 @@ export default function Gallery() {
                   <ChevronRight size={20} />
                 </button>
               </div>
-
-              {/* Expand button */}
+              
               <button
-                onClick={() => setPreviewImage(images[currentIndex])}
-                className="absolute top-3 right-3 z-20 w-9 h-9 rounded-xl bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                onClick={(e) => { e.stopPropagation(); setPreviewImage(images[currentIndex]); }}
+                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-xl bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all"
               >
-                <Maximize2 size={16} />
+                <Maximize2 size={18} />
               </button>
             </div>
 
-            {/* Bottom Control Bar */}
             <div className="p-6 flex flex-col flex-1 border-t border-white/10 relative z-20">
               <h3 className="text-xl font-bold text-white mb-2">Installations</h3>
               <p className="text-sm text-gray-400 mb-6 flex-1">Explore our products deployed in real-world industrial environments.</p>
@@ -183,7 +184,7 @@ export default function Gallery() {
                 onClick={() => setShowGrid(true)}
                 className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl transition-all border border-white/10 hover:border-white/30"
               >
-                <Grid size={18} /> View Gallery
+                <Grid size={16} /> View Gallery
               </button>
             </div>
           </div>
@@ -307,7 +308,7 @@ export default function Gallery() {
             </div>
 
             <div className="p-6 flex flex-col flex-1 border-t border-white/10 relative z-20">
-              <h3 className="text-xl font-bold text-white mb-2">Exhibition Stalls</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Exhibition/ Events</h3>
               <p className="text-sm text-gray-400 mb-6 flex-1">Check out our booths and product showcases from global expos.</p>
               <button
                 onClick={() => setShowStallPhotos(true)}
@@ -321,7 +322,7 @@ export default function Gallery() {
       </div>
       </section>
 
-      {/* Grid Modal */}
+      {/* Installations Grid Modal */}
       <AnimatePresence>
         {showGrid && (
           <motion.div
@@ -475,13 +476,8 @@ export default function Gallery() {
             >
               <img
                 src={previewImage.src}
-                alt={`Installation ${previewImage.id}`}
+                alt={`Preview ${previewImage.id}`}
                 className="w-full h-auto max-h-[85vh] object-contain rounded-lg shadow-2xl"
-                onError={(e) => {
-                  if (previewImage.src.includes('stall')) {
-                    e.currentTarget.src = 'https://images.pexels.com/photos/236750/pexels-photo-236750.jpeg?auto=compress&cs=tinysrgb&w=1200';
-                  }
-                }}
               />
             </motion.div>
           </motion.div>

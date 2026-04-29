@@ -12,7 +12,7 @@ const team = [
     desc: 'Leading business development, global strategic growth and partnerships.'
   },
   {
-    name: 'Dhananjaya Palshikar',
+    name: 'Dhananjay Palshikar',
     role: 'R&D and Production Head',
     image: '/dhananjay.png',
     desc: 'Leading research, development and production operations to drive continuous innovation.'

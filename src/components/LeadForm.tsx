@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Send, Phone, Mail, MapPin, CheckCircle2, Linkedin, Facebook, Youtube } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, Phone, Mail, MapPin, CheckCircle, Linkedin, Facebook, Youtube } from 'lucide-react';
 
 const contactInfo = [
   { icon: Phone, label: 'Phone', value: '+91-731-4855999' },
@@ -22,9 +22,28 @@ export default function LeadForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    setSubmitted(true);
+
+    try {
+      const response = await fetch('https://formspree.io/f/xwvykygw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      } else {
+        console.error("Form submission failed");
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,7 +73,7 @@ export default function LeadForm() {
             </span>
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-           By contacting Sapcon Instruments Pvt Ltd, via the contact form or the above phone numbers, you agree to be contacted by email or telephone(via 3rd Party Service) by our representative
+            By contacting Sapcon Instruments Pvt Ltd, via the contact form or the above phone numbers, you agree to be contacted by email or telephone(via 3rd Party Service) by our representative
           </p>
         </div>
 
@@ -135,7 +154,7 @@ export default function LeadForm() {
                     className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
                     style={{ background: 'linear-gradient(135deg, rgba(74,108,247,0.2), rgba(6,182,212,0.1))' }}
                   >
-                    <CheckCircle2 size={32} className="text-[#4A6CF7]" />
+                    <CheckCircle size={32} className="text-[#4A6CF7]" />
                   </div>
                   <h3 className="text-white text-2xl font-bold mb-3">Message Sent!</h3>
                   <p className="text-gray-400 max-w-sm">
